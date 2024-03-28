@@ -14,8 +14,8 @@ const localLogin = new LocalStrategy(
     return user
       ? done(null, user)
       : done(null, false, {
-          message: "Your login details are not valid. Please try again",
-        });
+        message: "Your login details are not valid. Please try again",
+      });
   }
 );
 
@@ -35,16 +35,16 @@ passport.use(new GitHubStrategy({
   clientSecret: 'f8c1693dd344a9fc96d5944be417b09b95f605a2',
   callbackURL: "http://localhost:3000/auth/github/callback"
 },
-function(accessToken, refreshToken, profile, done) {
-  return done(null, profile);
-}
+  function (accessToken, refreshToken, profile, done) {
+    return done(null, profile);
+  }
 ));
-passport.serializeUser(function (userOther, done) {
-  done(null, userOther.login);
-});
-passport.deserializeUser(function(obj, done) {
-  done(null, obj);
-});
+// passport.serializeUser(function (user, done) {
+//   done(null, user.login);
+// });
+// passport.deserializeUser(function(obj, done) {
+//   done(null, obj);
+// });
 // const GithubStrategy = require("passport-github2").Strategy;
 // passport.use(new GithubStrategy({
 //   clientID: '3d50f3d05fe83577ea3e',
@@ -59,7 +59,7 @@ passport.deserializeUser(function(obj, done) {
 //       email: profile.emails[0].value,
 //       password: "password", // Consider using hashed password instead of plain text
 //     };
-  
+
 //     userModel.findOne({ email: user.email }, function(err, existingUser) {
 //       console.log(`something aslkdfja;sldkjfas;dlkfjads;lfjasd;lfkj ${existingUser}`)
 //       if (err) {
@@ -100,15 +100,20 @@ Doing user.id will hold on to the id of the user because the id never changes.
 will create req.user = user : will hold all important information about the user.
 */
 passport.serializeUser(function (user, done) {
-  done(null, user);
+  if (user.login) done(null, user.login);
+  else done(null, user);
 });
 
 passport.deserializeUser(function (id, done) {
-  let user = userController.getUserById(id);
-  if (user) {
-    done(null, user);
+  if (typeof id === "object") {
+    done(null, id);
   } else {
-    done({ message: "User not found" }, null);
+    let user = userController.getUserById(id);
+    if (user) {
+      done(null, user);
+    } else {
+      done({ message: "User not found" }, null);
+    }
   }
 });
 

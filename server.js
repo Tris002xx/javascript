@@ -37,9 +37,6 @@ app.get('/auth/login', function(req, res){
   res.render('login', { user: req.user });
 });
 
-
-
-
 app.get('/auth/github', 
   passport.authenticate('github', { user: [ 'user:req.session.username' ] }),
   function(req, res) {
